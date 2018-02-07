@@ -21,25 +21,17 @@ use Data::Dumper ;
 my $keys = qr{(?:raz|dva|tri)\:}os ;
 
 # заполнение результата
-my %result = map {
-	my $result = $_ ;
-
-	map {
-		substr( $_ , 0 , -1 ) => $result->{ $_ } ;
-	} keys( %$result ) ;
-} + {
-	<DATA> =~ m{
-		(
-			$keys # тег
-		) (
-			.+? # данные
-		) (?=
-			$keys # следующий тег
-			|
-			$ # или конец строки
-		)
-	}gusix
-} ;
+my %result = <DATA> =~ m{
+	(
+		$keys # тег
+	) (
+		.+? # данные
+	) (?=
+		$keys # следующий тег
+		|
+		$ # или конец строки
+	)
+}gusix ;
 
 # вывод результата
 print( &Dumper( \%result ) ) ;
