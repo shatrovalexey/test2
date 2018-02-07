@@ -12,26 +12,34 @@ use strict ;
 use warnings ;
 use locale ;
 use utf8 ;
-use Perl::Critic ;
 use Data::Dumper ;
 
 # настройка ввода\вывода
 ( $\ , $/ ) = "\n" ;
 
+# возможные ключи
+my $keys = qr{(?:raz|dva|tri)\:}os ;
+
 # заполнение результата
-my %result = <DATA> =~ m{
-	# тег
-	(raz|dva|tri)\:
-	( # данные
-		.+?
-	)
-	(?=
-		# следующий тег
-		(?:raz|dva|tri)\: |
-		# или конец строки
-		$
-	)
-}ixugs ;
+my %result = map {
+	my $result = $_ ;
+
+	map {
+		substr( $_ , 0 , -1 ) => $result->{ $_ } ;
+	} keys( %$result ) ;
+} + {
+	<DATA> =~ m{
+		(
+			$keys # тег
+		) (
+			.+? # данные
+		) (?=
+			$keys # следующий тег
+			|
+			$ # или конец строки
+		)
+	}gusix
+} ;
 
 # вывод результата
 print( &Dumper( \%result ) ) ;
